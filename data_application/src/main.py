@@ -2,6 +2,7 @@ import sys
 import numpy as np
 import pyqtgraph as pg
 from camera import Camera
+from lepton import LeptonCamera
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QPainter, QFont
 from PyQt5.QtWidgets import QApplication, QWidget, QGridLayout, QPushButton, QHBoxLayout, QVBoxLayout, QLabel
@@ -12,8 +13,11 @@ class GridExample(QWidget):
         self.gathering = False
         self.showCameras = True
         self.camera = Camera()
+        self.thermal_camera = LeptonCamera()
         self.camera.imageUpdate.connect(self.imageUpdateSlot)
+        self.thermal_camera.imageUpdate.connect(self.imageTUpdateSlot)
         self.camera.start()
+        self.thermal_camera.start()
 
         self.initUI()
 
@@ -71,8 +75,10 @@ class GridExample(QWidget):
         self.textLabel.setText("Showing data")
         self.showCameras = True
         self.camera.start()
+        self.thermal_camera.start()
         self.updateCameraConnection()
         self.camera.frames = []
+        self.thermal_camera.frames = []
 
     def stopPlots(self):
         self.textLabel.setText("Press F1 to start data gathering")
@@ -87,8 +93,10 @@ class GridExample(QWidget):
     def updateCameraConnection(self):
         if self.showCameras:
             self.camera.imageUpdate.connect(self.imageUpdateSlot)
+            self.thermal_camera.imageUpdate.connect(self.imageTUpdateSlot)
         else:
             self.camera.imageUpdate.disconnect(self.imageUpdateSlot)
+            self.thermal_camera.imageUpdate.disconnect(self.imageTUpdateSlot)
             self.cameraFeed.setPixmap(self.placeholderImage)
             self.thermalCameraFeed.setPixmap(self.placeholderImage)
 
@@ -96,6 +104,7 @@ class GridExample(QWidget):
         if event.key() == Qt.Key_F1:
             self.showCameras = False
             self.camera.gathering = True
+            self.thermal_camera.gathering = True
             self.textLabel.setText("Data gathering, press F2 to stop")
             self.startDataCollection()
         elif event.key() == Qt.Key_F2:
@@ -111,14 +120,19 @@ class GridExample(QWidget):
 
     def stopAndSaveData(self):
         self.camera.stop()
+        self.thermal_camera.stop()
         cameraData = self.camera.getFrames()
+        leptonData = self.thermal_camera.getFrames()
         saveDir = "data_application/collected/gathered_data.npz"
-        np.savez(saveDir, cameraData=cameraData)
+        np.savez(saveDir, cameraData=cameraData, leptonData=leptonData)
         self.textLabel.setText(f"Data saved at {saveDir}")
         # print("Data saved to gathered_data.npz")
 
     def imageUpdateSlot(self, image):
         self.cameraFeed.setPixmap(QPixmap.fromImage(image))
+
+    def imageTUpdateSlot(self, image):
+        self.thermalCameraFeed.setPixmap(QPixmap.fromImage(image))
 
     def createPlaceholderImage(self, text):
         image = QPixmap(500, 380)
