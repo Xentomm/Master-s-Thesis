@@ -15,6 +15,7 @@ $ git clone https://github.com/Xentomm/Master-s-Thesis.git
 $ cd project-name
 $ python -m venv .env (or conda)
 $ source .env/Scripts/actiavate (Windows) | source .env/bin/activate (Linux)
+$ python.exe -m pip install --upgrade pip
 $ pip install -r requirements.txt
 ```
 TODO
