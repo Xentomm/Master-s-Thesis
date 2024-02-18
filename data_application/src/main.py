@@ -1,16 +1,49 @@
 import sys
+import os
 import numpy as np
 import pyqtgraph as pg
 from camera import Camera
 from lepton import LeptonCamera
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QPainter, QFont
-from PyQt5.QtWidgets import QApplication, QWidget, QGridLayout, QPushButton, QHBoxLayout, QVBoxLayout, QLabel, QAction, QInputDialog
-# from daq import DataCollectionThread
+from PyQt5.QtWidgets import QApplication, QWidget, QGridLayout, QPushButton, QHBoxLayout, QVBoxLayout, QLabel, QAction, QInputDialog, QMainWindow, QMenuBar, QLineEdit, QDialog, QDialogButtonBox, QVBoxLayout, QFormLayout
 
-class GridExample(QWidget):
+class DirectoryInputDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.setWindowTitle("Set Directory")
+        self.layout = QVBoxLayout()
+
+        self.control = QLineEdit(self)
+        self.text1 = QLineEdit(self)
+        self.text2 = QLineEdit(self)
+        self.text3 = QLineEdit(self)
+
+        formLayout = QFormLayout()
+        formLayout.addRow("Control", self.control)
+        formLayout.addRow("Name:", self.text1)
+        formLayout.addRow("Surname:", self.text2)
+        formLayout.addRow("Age:", self.text3)
+
+        self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+
+        self.layout.addLayout(formLayout)
+        self.layout.addWidget(self.buttonBox)
+        self.setLayout(self.layout)
+
+    def getInputs(self):
+        return self.control.text(), self.text1.text(), self.text2.text(), self.text3.text()
+
+class GridExample(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.control = ""
+        self.name = ""
+        self.surname = ""
+        self.age = ""
         self.gathering = False
         self.showCameras = True
         self.camera = Camera()
@@ -20,18 +53,33 @@ class GridExample(QWidget):
         self.camera.start()
         self.thermal_camera.start()
 
-        # self.device_description = "USB-4716,BID#0"
-        # self.profile_path = "../../profile/DemoDevice.xml"
-        # self.channel_count = 2
-        # self.start_channel = 0
-        # self.data_thread = DataCollectionThread(self.device_description, self.profile_path,
-        #                                         self.channel_count, self.start_channel)
+        # Menu Bar
+        menubar = self.menuBar()
+        fileMenu = menubar.addMenu('&File')
+
+        resetAction = QAction('&Reset', self)
+        resetAction.triggered.connect(self.resetApp)
+        fileMenu.addAction(resetAction)
+
+        exitAction = QAction('&Exit', self)
+        exitAction.setShortcut('Ctrl+Q')
+        exitAction.triggered.connect(self.close)
+        fileMenu.addAction(exitAction)
+
+        # Directory Menu
+        dirMenu = menubar.addMenu('&Directory')
+
+        setDirAction = QAction('&Set Directory', self)
+        setDirAction.triggered.connect(self.setDirectory)
+        dirMenu.addAction(setDirAction)
 
         self.initUI()
 
     def initUI(self):
         mainLayout = QVBoxLayout()
-        self.setLayout(mainLayout)
+        centralWidget = QWidget()
+        self.setCentralWidget(centralWidget)
+        centralWidget.setLayout(mainLayout)
         
         grid = QGridLayout()
         mainLayout.addLayout(grid)
@@ -39,6 +87,7 @@ class GridExample(QWidget):
         infoLabel = QLabel("Instructions:\n\n"
                        "Watch camera feed and setup them correctly.\n"
                        "Setup ActiveView.\n"
+                       "Setup Directory in Menu Bar.\n"
                        "Click on Stop Plotting.\n"
                        "Press F1 to start data gathering.\n"
                        "Press F2 to stop data gathering and save.\n"
@@ -46,7 +95,7 @@ class GridExample(QWidget):
                        "\n"
                        "\n"
                        "\n"
-                       "Press Reset to restart the application.\n"
+                       "Press File -> Reset in Menu Bar to restart the application.\n"
                        "Press Start Plotting to show camera feeds.\n"
                        "Press Stop Plotting to pause camera feeds.")
         infoLabel.setAlignment(Qt.AlignCenter)
@@ -85,14 +134,14 @@ class GridExample(QWidget):
         stopButton.clicked.connect(self.stopPlots)
         buttonLayout.addWidget(stopButton)
 
-        resetButton = QPushButton('Reset')
-        resetButton.setFixedSize(100, 50)
-        resetButton.clicked.connect(self.resetApp)
-        buttonLayout.addWidget(resetButton)
-
         self.setWindowTitle('Data Application')
         self.setGeometry(0, 0, 990, 1010)
         self.show()
+
+    def setDirectory(self):
+        dialog = DirectoryInputDialog()
+        if dialog.exec_():
+            self.control, self.name, self.surname, self.age = dialog.getInputs()
 
     def resetApp(self):
         self.textLabel.setText("Showing data")
@@ -128,7 +177,6 @@ class GridExample(QWidget):
             self.showCameras = False
             self.camera.gathering = True
             self.thermal_camera.gathering = True
-            self.data_thread.start()
             self.textLabel.setText("Data gathering, press F2 to stop")
             self.dataStatusLabel.setText("Data gathering")
             self.startDataCollection()
@@ -147,13 +195,11 @@ class GridExample(QWidget):
     def stopAndSaveData(self):
         self.camera.stop()
         self.thermal_camera.stop()
-        self.data_thread.stop()
         cameraData = self.camera.getFrames()
         leptonData = self.thermal_camera.getFrames()
-        daqData = self.data_thread.getData()
-        saveDir = "data_application/collected/" # ŁE24/ .bdf .csv .npz
+        saveDir = f"data_application/collected/{self.name[0]}{self.surname[0]}{self.age}_{self.control}/"
+        os.makedirs(saveDir, exist_ok=True)
         np.savez(saveDir + "gathered_data.npz", cameraData=cameraData, leptonData=leptonData)
-        daqData.to_csv(saveDir + "daq.csv")
         self.textLabel.setText(f"Data saved at {saveDir}")
 
     def imageUpdateSlot(self, image):
