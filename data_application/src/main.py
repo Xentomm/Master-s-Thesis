@@ -5,7 +5,8 @@ from camera import Camera
 from lepton import LeptonCamera
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QPainter, QFont
-from PyQt5.QtWidgets import QApplication, QWidget, QGridLayout, QPushButton, QHBoxLayout, QVBoxLayout, QLabel
+from PyQt5.QtWidgets import QApplication, QWidget, QGridLayout, QPushButton, QHBoxLayout, QVBoxLayout, QLabel, QAction, QInputDialog
+# from daq import DataCollectionThread
 
 class GridExample(QWidget):
     def __init__(self):
@@ -19,6 +20,13 @@ class GridExample(QWidget):
         self.camera.start()
         self.thermal_camera.start()
 
+        # self.device_description = "USB-4716,BID#0"
+        # self.profile_path = "../../profile/DemoDevice.xml"
+        # self.channel_count = 2
+        # self.start_channel = 0
+        # self.data_thread = DataCollectionThread(self.device_description, self.profile_path,
+        #                                         self.channel_count, self.start_channel)
+
         self.initUI()
 
     def initUI(self):
@@ -28,8 +36,23 @@ class GridExample(QWidget):
         grid = QGridLayout()
         mainLayout.addLayout(grid)
 
-        plotGsr = pg.PlotWidget()
-        plotEkg = pg.PlotWidget()
+        infoLabel = QLabel("Instructions:\n\n"
+                       "Watch camera feed and setup them correctly.\n"
+                       "Setup ActiveView.\n"
+                       "Click on Stop Plotting.\n"
+                       "Press F1 to start data gathering.\n"
+                       "Press F2 to stop data gathering and save.\n"
+                       "\n"
+                       "\n"
+                       "\n"
+                       "\n"
+                       "Press Reset to restart the application.\n"
+                       "Press Start Plotting to show camera feeds.\n"
+                       "Press Stop Plotting to pause camera feeds.")
+        infoLabel.setAlignment(Qt.AlignCenter)
+        
+        self.dataStatusLabel = QLabel("Data Thread Status: Idle")
+        self.dataStatusLabel.setAlignment(Qt.AlignCenter)
 
         self.cameraFeed = QLabel()
         self.thermalCameraFeed = QLabel()
@@ -38,8 +61,8 @@ class GridExample(QWidget):
         self.cameraFeed.setPixmap(self.placeholderImage)
         self.thermalCameraFeed.setPixmap(self.placeholderImage)
 
-        grid.addWidget(plotGsr, 0, 0)
-        grid.addWidget(plotEkg, 1, 0)
+        grid.addWidget(infoLabel, 0, 0)
+        grid.addWidget(self.dataStatusLabel, 1, 0)
         grid.addWidget(self.cameraFeed, 0, 1)
         grid.addWidget(self.thermalCameraFeed, 1, 1)
 
@@ -52,14 +75,14 @@ class GridExample(QWidget):
         buttonLayout = QHBoxLayout()
         mainLayout.addLayout(buttonLayout)
 
-        startButton = QPushButton('Stop Plotting')
+        startButton = QPushButton('Start Plotting')
         startButton.setFixedSize(100, 50)
-        startButton.clicked.connect(self.stopPlots)
+        startButton.clicked.connect(self.startPlots)
         buttonLayout.addWidget(startButton)
 
-        stopButton = QPushButton('Start Plotting')
+        stopButton = QPushButton('Stop Plotting')
         stopButton.setFixedSize(100, 50)
-        stopButton.clicked.connect(self.startPlots)
+        stopButton.clicked.connect(self.stopPlots)
         buttonLayout.addWidget(stopButton)
 
         resetButton = QPushButton('Reset')
@@ -68,7 +91,7 @@ class GridExample(QWidget):
         buttonLayout.addWidget(resetButton)
 
         self.setWindowTitle('Data Application')
-        self.setGeometry(50, 50, 1600, 800)
+        self.setGeometry(0, 0, 990, 1010)
         self.show()
 
     def resetApp(self):
@@ -105,11 +128,14 @@ class GridExample(QWidget):
             self.showCameras = False
             self.camera.gathering = True
             self.thermal_camera.gathering = True
+            self.data_thread.start()
             self.textLabel.setText("Data gathering, press F2 to stop")
+            self.dataStatusLabel.setText("Data gathering")
             self.startDataCollection()
         elif event.key() == Qt.Key_F2:
             self.camera.gathering = False
             self.textLabel.setText("Saving data")
+            self.dataStatusLabel.setText("Saving data")
             self.cameraFeed.setPixmap(self.createPlaceholderImage("Data saving"))
             self.thermalCameraFeed.setPixmap(self.createPlaceholderImage("Data saving"))
             self.stopAndSaveData()
@@ -121,12 +147,14 @@ class GridExample(QWidget):
     def stopAndSaveData(self):
         self.camera.stop()
         self.thermal_camera.stop()
+        self.data_thread.stop()
         cameraData = self.camera.getFrames()
         leptonData = self.thermal_camera.getFrames()
-        saveDir = "data_application/collected/gathered_data.npz"
-        np.savez(saveDir, cameraData=cameraData, leptonData=leptonData)
+        daqData = self.data_thread.getData()
+        saveDir = "data_application/collected/" # ŁE24/ .bdf .csv .npz
+        np.savez(saveDir + "gathered_data.npz", cameraData=cameraData, leptonData=leptonData)
+        daqData.to_csv(saveDir + "daq.csv")
         self.textLabel.setText(f"Data saved at {saveDir}")
-        # print("Data saved to gathered_data.npz")
 
     def imageUpdateSlot(self, image):
         self.cameraFeed.setPixmap(QPixmap.fromImage(image))
