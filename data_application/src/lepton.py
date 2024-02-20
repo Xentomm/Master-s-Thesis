@@ -1,7 +1,8 @@
+import cv2
 import numpy as np
 from flirpy.camera.lepton import Lepton
 from PyQt5.QtGui import QImage
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import QThread, pyqtSignal, Qt
 
 class LeptonCamera(QThread):
     imageUpdate = pyqtSignal(QImage)
@@ -16,11 +17,14 @@ class LeptonCamera(QThread):
         with Lepton() as l:
             while self.threadActive:
                 frame = l.grab().astype(np.float32)
-                frame = (frame / frame.max()) * 255.0
+                frame = 255*(frame - frame.min())/(frame.max() - frame.min())
                 frame = frame.astype(np.uint8)
                 if frame is not None:
-                    self.frames.append(frame)
-                    self.imageUpdate.emit(self.convertFrameToQImage(frame))
+                    image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    flippedImage = cv2.flip(image, 1)
+                    convert2qt = QImage(flippedImage.data, flippedImage.shape[1], flippedImage.shape[0], QImage.Format_RGB888)
+                    pic = convert2qt.scaled(500, 400, Qt.KeepAspectRatio)
+                    self.imageUpdate.emit(pic)
                     if self.gathering:
                         self.frames.append(frame)
 
@@ -30,10 +34,3 @@ class LeptonCamera(QThread):
 
     def getFrames(self):
         return np.array(self.frames)
-
-    def convertFrameToQImage(self, frame):
-        height, width = frame.shape
-        bytesPerLine = width
-        image = QImage(frame.data, width, height, bytesPerLine, QImage.Format_Grayscale8)
-        image = image.convertToFormat(QImage.Format_RGB888)
-        return image

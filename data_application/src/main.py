@@ -2,6 +2,7 @@ import sys
 import os
 import numpy as np
 import pyqtgraph as pg
+from daq import DataCollectionThread
 from camera import Camera
 from lepton import LeptonCamera
 from PyQt5.QtCore import Qt
@@ -44,6 +45,7 @@ class GridExample(QMainWindow):
         self.name = ""
         self.surname = ""
         self.age = ""
+        self.saveDir = ""
         self.gathering = False
         self.showCameras = True
         self.camera = Camera()
@@ -52,6 +54,13 @@ class GridExample(QMainWindow):
         self.thermal_camera.imageUpdate.connect(self.imageTUpdateSlot)
         self.camera.start()
         self.thermal_camera.start()
+
+        self.device_description = "USB-4716,BID#0"
+        self.profile_path = "../../profile/DemoDevice.xml"
+        self.channel_count = 2
+        self.start_channel = 0
+        self.data_thread = DataCollectionThread(self.device_description, self.profile_path,
+                                                self.channel_count, self.start_channel)
 
         # Menu Bar
         menubar = self.menuBar()
@@ -148,7 +157,9 @@ class GridExample(QMainWindow):
         dialog = DirectoryInputDialog()
         if dialog.exec_():
             self.control, self.name, self.surname, self.age = dialog.getInputs()
-            self.textLabel1.setText(f"Save directory: data_application/collected/{self.name[0]}{self.surname[0]}{self.age}_{self.control}/")
+            self.saveDir = f"data_application/collected/{self.name[0]}{self.surname[0]}{self.age}_{self.control}/"
+            os.makedirs(self.saveDir, exist_ok=True)
+            self.textLabel1.setText(self.saveDir)
 
     def resetApp(self):
         self.textLabel.setText("Showing data")
@@ -163,6 +174,7 @@ class GridExample(QMainWindow):
         self.name = ""
         self.surname = ""
         self.age = ""
+        self.saveDir = ""
 
     def stopPlots(self):
         self.textLabel.setText("Press F1 to start data gathering")
@@ -189,11 +201,13 @@ class GridExample(QMainWindow):
             self.showCameras = False
             self.camera.gathering = True
             self.thermal_camera.gathering = True
+            self.data_thread.start()
             self.textLabel.setText("Data gathering, press F2 to stop")
             self.dataStatusLabel.setText("Data Thread Status: Data gathering")
             self.startDataCollection()
         elif event.key() == Qt.Key_F2:
             self.camera.gathering = False
+            self.thermal_camera.gathering = False
             self.textLabel.setText("Saving data")
             self.dataStatusLabel.setText("Saving data")
             self.cameraFeed.setPixmap(self.createPlaceholderImage("Data saving"))
@@ -207,14 +221,14 @@ class GridExample(QMainWindow):
     def stopAndSaveData(self):
         self.camera.stop()
         self.thermal_camera.stop()
+        self.data_thread.stop()
         cameraData = self.camera.getFrames()
         leptonData = self.thermal_camera.getFrames()
-        saveDir = f"data_application/collected/{self.name[0]}{self.surname[0]}{self.age}_{self.control}/"
-        os.makedirs(saveDir, exist_ok=True)
-        np.savez(saveDir + "gathered_data.npz", cameraData=cameraData, leptonData=leptonData)
-        # daqData = self.data_thread.getData()
-        # daqData.to_csv(saveDir + "daq.csv")
-        self.textLabel.setText(f"Data saved at {saveDir}")
+        np.savez(self.saveDir + "data.npz", cameraData=cameraData, leptonData=leptonData)
+        daqData, daqData1 = self.data_thread.getData()
+        daqData.to_csv(self.saveDir + "ekg.csv", index=False)
+        daqData1.to_csv(self.saveDir + "gsr.csv", index=False)
+        self.textLabel.setText(f"Data saved at {self.saveDir}")
 
     def imageUpdateSlot(self, image):
         self.cameraFeed.setPixmap(QPixmap.fromImage(image))
