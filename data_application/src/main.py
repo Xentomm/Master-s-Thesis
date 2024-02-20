@@ -225,9 +225,10 @@ class GridExample(QMainWindow):
         cameraData = self.camera.getFrames()
         leptonData = self.thermal_camera.getFrames()
         np.savez(self.saveDir + "data.npz", cameraData=cameraData, leptonData=leptonData)
-        daqData, daqData1 = self.data_thread.getData()
-        daqData.to_csv(self.saveDir + "ekg.csv", index=False)
-        daqData1.to_csv(self.saveDir + "gsr.csv", index=False)
+        # daqData, daqData1 = self.data_thread.getData()
+        daqData = self.data_thread.getData()
+        daqData.to_csv(self.saveDir + "output_daq.csv", index=False)
+        # daqData1.to_csv(self.saveDir + "gsr.csv", index=False)
         self.textLabel.setText(f"Data saved at {self.saveDir}")
 
     def imageUpdateSlot(self, image):
