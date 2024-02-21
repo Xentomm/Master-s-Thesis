@@ -62,7 +62,6 @@ class GridExample(QMainWindow):
         self.data_thread = DataCollectionThread(self.device_description, self.profile_path,
                                                 self.channel_count, self.start_channel)
 
-        # Menu Bar
         menubar = self.menuBar()
         fileMenu = menubar.addMenu('&File')
 
@@ -75,7 +74,6 @@ class GridExample(QMainWindow):
         exitAction.triggered.connect(self.close)
         fileMenu.addAction(exitAction)
 
-        # Directory Menu
         dirMenu = menubar.addMenu('&Directory')
 
         setDirAction = QAction('&Set Directory', self)
