@@ -10,7 +10,7 @@ dir_path = f"data_application/collected/{input_dir}/"
 
 df = pd.read_csv(dir_path + "output_daq.csv")
 
-npz_data = np.load(dir_path + "gathered_data.npz")
+npz_data = np.load(dir_path + "data.npz")
 print("Keys in the npz file:")
 for key in npz_data.keys():
     print(key)
@@ -19,9 +19,9 @@ frames_lepton = npz_data['leptonData']
 
 # Plotting CSV data
 fig_csv, axs_csv = plt.subplots(2)
-axs_csv[0].plot(df["ekg"][10000:20000])
+axs_csv[0].plot(df["ekg"][:10000])
 axs_csv[0].set_title("EKG")
-axs_csv[1].plot(df["gsr"][10000:20000])
+axs_csv[1].plot(df["gsr"][:10000])
 axs_csv[1].set_title("GSR")
 
 # Plotting data from NPZ file
