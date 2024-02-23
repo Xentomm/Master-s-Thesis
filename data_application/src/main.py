@@ -1,7 +1,8 @@
 import sys
 import os
 import numpy as np
-import pyqtgraph as pg
+import logger
+import logging
 from daq import DataCollectionThread
 from camera import Camera
 from lepton import LeptonCamera
@@ -83,6 +84,7 @@ class GridExample(QMainWindow):
         self.initUI()
 
     def initUI(self):
+        logging.info('Start')
         mainLayout = QVBoxLayout()
         centralWidget = QWidget()
         self.setCentralWidget(centralWidget)
@@ -156,6 +158,7 @@ class GridExample(QMainWindow):
         if dialog.exec_():
             self.control, self.name, self.surname, self.age = dialog.getInputs()
             self.saveDir = f"data_application/collected/{self.name[0]}{self.surname[0]}{self.age}_{self.control}/"
+            logging.critical(f"Save dir: {self.saveDir}")
             os.makedirs(self.saveDir, exist_ok=True)
             self.textLabel1.setText(self.saveDir)
 
@@ -250,6 +253,7 @@ class GridExample(QMainWindow):
         return image
 
 if __name__ == '__main__':
+    logger.setup_logging()
     app = QApplication(sys.argv)
     ex = GridExample()
     sys.exit(app.exec_())
