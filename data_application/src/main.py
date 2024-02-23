@@ -3,7 +3,7 @@ import os
 import numpy as np
 import logger
 import logging
-from daq import DataCollectionThread
+# from daq import DataCollectionThread
 from camera import Camera
 from lepton import LeptonCamera
 from PyQt5.QtCore import Qt
@@ -50,18 +50,18 @@ class GridExample(QMainWindow):
         self.gathering = False
         self.showCameras = True
         self.camera = Camera()
-        self.thermal_camera = LeptonCamera()
+        # self.thermal_camera = LeptonCamera()
         self.camera.imageUpdate.connect(self.imageUpdateSlot)
-        self.thermal_camera.imageUpdate.connect(self.imageTUpdateSlot)
+        # self.thermal_camera.imageUpdate.connect(self.imageTUpdateSlot)
         self.camera.start()
-        self.thermal_camera.start()
+        # self.thermal_camera.start()
 
         self.device_description = "USB-4716,BID#0"
         self.profile_path = "../../profile/DemoDevice.xml"
         self.channel_count = 2
         self.start_channel = 0
-        self.data_thread = DataCollectionThread(self.device_description, self.profile_path,
-                                                self.channel_count, self.start_channel)
+        # self.data_thread = DataCollectionThread(self.device_description, self.profile_path,
+        #                                         self.channel_count, self.start_channel)
 
         menubar = self.menuBar()
         fileMenu = menubar.addMenu('&File')
@@ -167,15 +167,16 @@ class GridExample(QMainWindow):
         self.textLabel1.setText("Save directory: ")
         self.showCameras = True
         self.camera.start()
-        self.thermal_camera.start()
+        # self.thermal_camera.start()
         self.updateCameraConnection()
         self.camera.frames = []
-        self.thermal_camera.frames = []
+        # self.thermal_camera.frames = []
         self.control = ""
         self.name = ""
         self.surname = ""
         self.age = ""
         self.saveDir = ""
+        logging.info("App reset")
 
     def stopPlots(self):
         self.textLabel.setText("Press F1 to start data gathering")
@@ -190,10 +191,10 @@ class GridExample(QMainWindow):
     def updateCameraConnection(self):
         if self.showCameras:
             self.camera.imageUpdate.connect(self.imageUpdateSlot)
-            self.thermal_camera.imageUpdate.connect(self.imageTUpdateSlot)
+            # self.thermal_camera.imageUpdate.connect(self.imageTUpdateSlot)
         else:
             self.camera.imageUpdate.disconnect(self.imageUpdateSlot)
-            self.thermal_camera.imageUpdate.disconnect(self.imageTUpdateSlot)
+            # self.thermal_camera.imageUpdate.disconnect(self.imageTUpdateSlot)
             self.cameraFeed.setPixmap(self.placeholderImage)
             self.thermalCameraFeed.setPixmap(self.placeholderImage)
 
@@ -201,14 +202,14 @@ class GridExample(QMainWindow):
         if event.key() == Qt.Key_F1:
             self.showCameras = False
             self.camera.gathering = True
-            self.thermal_camera.gathering = True
-            self.data_thread.start()
+            # self.thermal_camera.gathering = True
+            # self.data_thread.start()
             self.textLabel.setText("Data gathering, press F2 to stop")
             self.dataStatusLabel.setText("Data Thread Status: Data gathering")
             self.startDataCollection()
         elif event.key() == Qt.Key_F2:
             self.camera.gathering = False
-            self.thermal_camera.gathering = False
+            # self.thermal_camera.gathering = False
             self.textLabel.setText("Saving data")
             self.dataStatusLabel.setText("Saving data")
             self.cameraFeed.setPixmap(self.createPlaceholderImage("Data saving"))
@@ -221,14 +222,15 @@ class GridExample(QMainWindow):
 
     def stopAndSaveData(self):
         self.camera.stop()
-        self.thermal_camera.stop()
-        self.data_thread.stop()
+        # self.thermal_camera.stop()
+        # self.data_thread.stop()
         cameraData = self.camera.getFrames()
-        leptonData = self.thermal_camera.getFrames()
-        np.savez(self.saveDir + "data.npz", cameraData=cameraData, leptonData=leptonData)
+        # leptonData = self.thermal_camera.getFrames()
+        # np.savez(self.saveDir + "data.npz", cameraData=cameraData, leptonData=leptonData)
+        np.savez(self.saveDir + "data.npz", cameraData=cameraData)
         # daqData, daqData1 = self.data_thread.getData()
-        daqData = self.data_thread.getData()
-        daqData.to_csv(self.saveDir + "output_daq.csv", index=False)
+        # daqData = self.data_thread.getData()
+        # daqData.to_csv(self.saveDir + "output_daq.csv", index=False)
         # daqData1.to_csv(self.saveDir + "gsr.csv", index=False)
         self.textLabel.setText(f"Data saved at {self.saveDir}")
 
