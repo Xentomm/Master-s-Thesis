@@ -4,6 +4,7 @@ import numpy as np
 import logger
 import logging
 # from daq import DataCollectionThread
+from udpserver import UDPServer
 from camera import Camera
 from lepton import LeptonCamera
 from datetime import datetime
@@ -53,6 +54,10 @@ class GridExample(QMainWindow):
         # self.thermal_camera.imageUpdate.connect(self.imageTUpdateSlot)
         self.camera.start()
         # self.thermal_camera.start()
+
+        self.udp_server = UDPServer()
+        self.udp_server.key_pressed.connect(self.log_key_pressed)
+        self.udp_server.start()
 
         self.device_description = "USB-4716,BID#0"
         self.profile_path = "../../profile/DemoDevice.xml"
