@@ -262,6 +262,11 @@ class GridExample(QMainWindow):
         painter.end()
 
         return image
+    
+    def log_key_pressed(self, key):
+        function_keys = ["F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12"]
+        if key in function_keys:
+            logging.info(f"Function key pressed by client: {key}")
 
 if __name__ == '__main__':
     logger.setup_logging()
