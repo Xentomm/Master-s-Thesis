@@ -7,7 +7,7 @@ class UDPServer(QThread):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        config = read_config('config.json')
+        config = read_config('data_application/src/config.json')
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.socket.bind((config['server_ip'], config['server_port']))
 
