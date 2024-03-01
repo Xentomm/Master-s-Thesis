@@ -239,11 +239,11 @@ class GridExample(QMainWindow):
         # np.savez(self.saveDir + "data.npz", cameraData=cameraData, leptonData=leptonData)
         np.savez(self.saveDir + "data.npz", cameraData=cameraData)
 
-        # daqData, daqData1 = self.data_thread.getData()
-        # daqData1.to_csv(self.saveDir + "gsr.csv", index=False)
+        daqData, daqData1 = self.data_thread.getData()
+        daqData1.to_csv(self.saveDir + "gsr.csv", index=False)
 
-        # daqData = self.data_thread.getData() #new
-        # daqData.to_csv(self.saveDir + "output_daq.csv", index=False) #new
+        daqData = self.data_thread.getData() #new
+        daqData.to_csv(self.saveDir + "output_daq.csv", index=False) #new
 
         logging.info("Data saved")
         self.textLabel.setText(f"Data saved at {self.saveDir}")
