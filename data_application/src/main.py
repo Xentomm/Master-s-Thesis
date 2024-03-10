@@ -3,12 +3,12 @@ import os
 import numpy as np
 import logger
 import logging
-# from daq import DataCollectionThread
-from udpserver import UDPServer
+from daq import DataCollectionThread
+# from udpserver import UDPServer
 from camera import Camera
 from lepton import LeptonCamera
 from datetime import datetime
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QPixmap, QPainter, QFont
 from PyQt5.QtWidgets import QApplication, QWidget, QGridLayout, QPushButton, QHBoxLayout, QVBoxLayout, QLabel, QAction, QInputDialog, QMainWindow, QMenuBar, QLineEdit, QDialog, QDialogButtonBox, QVBoxLayout, QFormLayout
 
@@ -49,22 +49,22 @@ class GridExample(QMainWindow):
         self.gathering = False
         self.showCameras = True
         self.camera = Camera()
-        # self.thermal_camera = LeptonCamera()
+        self.thermal_camera = LeptonCamera()
         self.camera.imageUpdate.connect(self.imageUpdateSlot)
-        # self.thermal_camera.imageUpdate.connect(self.imageTUpdateSlot)
+        self.thermal_camera.imageUpdate.connect(self.imageTUpdateSlot)
         self.camera.start()
-        # self.thermal_camera.start()
+        self.thermal_camera.start()
 
-        self.udp_server = UDPServer()
-        self.udp_server.key_pressed.connect(self.log_key_pressed)
-        self.udp_server.start()
+        # self.udp_server = UDPServer()
+        # self.udp_server.key_pressed.connect(self.log_key_pressed)
+        # self.udp_server.start()
 
         self.device_description = "USB-4716,BID#0"
         self.profile_path = "../../profile/DemoDevice.xml"
         self.channel_count = 2
         self.start_channel = 0
-        # self.data_thread = DataCollectionThread(self.device_description, self.profile_path,
-        #                                         self.channel_count, self.start_channel)
+        self.data_thread = DataCollectionThread(self.device_description, self.profile_path,
+                                                self.channel_count, self.start_channel)
 
         menubar = self.menuBar()
         fileMenu = menubar.addMenu('&File')
@@ -172,10 +172,10 @@ class GridExample(QMainWindow):
         self.textLabel1.setText("Save directory: ")
         self.showCameras = True
         self.camera.start()
-        # self.thermal_camera.start()
+        self.thermal_camera.start()
         self.updateCameraConnection()
         self.camera.frames = []
-        # self.thermal_camera.frames = []
+        self.thermal_camera.frames = []
         self.control = ""
         self.name = ""
         self.surname = ""
@@ -198,33 +198,48 @@ class GridExample(QMainWindow):
         if self.showCameras:
             logging.info("Cameras connect update")
             self.camera.imageUpdate.connect(self.imageUpdateSlot)
-            # self.thermal_camera.imageUpdate.connect(self.imageTUpdateSlot)
+            self.thermal_camera.imageUpdate.connect(self.imageTUpdateSlot)
         else:
             logging.info("Cameras disconnect update")
             self.camera.imageUpdate.disconnect(self.imageUpdateSlot)
-            # self.thermal_camera.imageUpdate.disconnect(self.imageTUpdateSlot)
+            self.thermal_camera.imageUpdate.disconnect(self.imageTUpdateSlot)
             self.cameraFeed.setPixmap(self.placeholderImage)
             self.thermalCameraFeed.setPixmap(self.placeholderImage)
 
     def keyPressEvent(self, event):
+        f_keys = {
+        Qt.Key_F3: "F3",
+        Qt.Key_F4: "F4",
+        Qt.Key_F5: "F5",
+        Qt.Key_F6: "F6",
+        Qt.Key_F7: "F7",
+        Qt.Key_F8: "F8",
+        Qt.Key_F9: "F9",
+        Qt.Key_F10: "F10",
+        Qt.Key_F11: "F11",
+        Qt.Key_F12: "F12"
+    }
+
         if event.key() == Qt.Key_F1:
             if self.name == "":
                 self.setDirectory()
             self.showCameras = False
             self.camera.gathering = True
-            # self.thermal_camera.gathering = True
-            # self.data_thread.start()
+            self.thermal_camera.gathering = True
+            self.data_thread.start()
             self.textLabel.setText("Data gathering, press F2 to stop")
             self.dataStatusLabel.setText("Data Thread Status: Data gathering")
             self.startDataCollection()
         elif event.key() == Qt.Key_F2:
             self.camera.gathering = False
-            # self.thermal_camera.gathering = False
+            self.thermal_camera.gathering = False
             self.textLabel.setText("Saving data")
             self.dataStatusLabel.setText("Saving data")
             self.cameraFeed.setPixmap(self.createPlaceholderImage("Data saving"))
             self.thermalCameraFeed.setPixmap(self.createPlaceholderImage("Data saving"))
             self.stopAndSaveData()
+        elif event.key() in f_keys:
+            logging.info(f"{f_keys[event.key()]} pressed")
 
     def startDataCollection(self):
         self.cameraFeed.setPixmap(self.createPlaceholderImage("Data gathering, press F2 to stop"))
@@ -232,18 +247,18 @@ class GridExample(QMainWindow):
 
     def stopAndSaveData(self):
         self.camera.stop()
-        # self.thermal_camera.stop()
-        # self.data_thread.stop()
+        self.thermal_camera.stop()
+        self.data_thread.stop()
         cameraData = self.camera.getFrames()
-        # leptonData = self.thermal_camera.getFrames()
-        # np.savez(self.saveDir + "data.npz", cameraData=cameraData, leptonData=leptonData)
-        np.savez(self.saveDir + "data.npz", cameraData=cameraData)
+        leptonData = self.thermal_camera.getFrames()
+        np.savez(self.saveDir + "data.npz", cameraData=cameraData, leptonData=leptonData)
+        # np.savez(self.saveDir + "data.npz", cameraData=cameraData)
 
-        daqData, daqData1 = self.data_thread.getData()
-        daqData1.to_csv(self.saveDir + "gsr.csv", index=False)
+        # daqData, daqData1 = self.data_thread.getData()
+        # daqData1.to_csv(self.saveDir + "gsr.csv", index=False)
 
-        daqData = self.data_thread.getData() #new
-        daqData.to_csv(self.saveDir + "output_daq.csv", index=False) #new
+        daqData = self.data_thread.getData()
+        daqData.to_csv(self.saveDir + "output_daq.csv", index=False)
 
         logging.info("Data saved")
         self.textLabel.setText(f"Data saved at {self.saveDir}")
