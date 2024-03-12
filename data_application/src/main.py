@@ -201,6 +201,7 @@ class GridExample(QMainWindow):
             self.cameraFeed.setPixmap(self.placeholderImage)
             self.thermalCameraFeed.setPixmap(self.placeholderImage)
 
+    # TODO key pressed event when not focused on window
     def keyPressEvent(self, event):
         f_keys = {
         Qt.Key_F3: "F3",
