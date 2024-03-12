@@ -16,12 +16,12 @@ class LeptonCamera(QThread):
     def run(self):
         self.threadActive = True
         with Lepton() as l:
+            last_capture_time = time.time()
             while self.threadActive:
                 frame = l.grab().astype(np.float32)
                 frame = 255*(frame - frame.min())/(frame.max() - frame.min())
                 frame = frame.astype(np.uint8)
                 frame_interval = 1 / 3  # 3 frames per second
-                last_capture_time = time.time()
                 if frame is not None:
                     current_time = time.time()
                     if current_time - last_capture_time >= frame_interval:

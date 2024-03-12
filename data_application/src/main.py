@@ -4,7 +4,6 @@ import numpy as np
 import logger
 import logging
 from daq import DataCollectionThread
-# from udpserver import UDPServer
 from camera import Camera
 from lepton import LeptonCamera
 from datetime import datetime
@@ -54,10 +53,6 @@ class GridExample(QMainWindow):
         self.thermal_camera.imageUpdate.connect(self.imageTUpdateSlot)
         self.camera.start()
         self.thermal_camera.start()
-
-        # self.udp_server = UDPServer()
-        # self.udp_server.key_pressed.connect(self.log_key_pressed)
-        # self.udp_server.start()
 
         self.device_description = "USB-4716,BID#0"
         self.profile_path = "../../profile/DemoDevice.xml"
@@ -252,13 +247,10 @@ class GridExample(QMainWindow):
         cameraData = self.camera.getFrames()
         leptonData = self.thermal_camera.getFrames()
         np.savez(self.saveDir + "data.npz", cameraData=cameraData, leptonData=leptonData)
-        # np.savez(self.saveDir + "data.npz", cameraData=cameraData)
 
-        # daqData, daqData1 = self.data_thread.getData()
-        # daqData1.to_csv(self.saveDir + "gsr.csv", index=False)
-
-        daqData = self.data_thread.getData()
-        daqData.to_csv(self.saveDir + "output_daq.csv", index=False)
+        daqData, daqData1 = self.data_thread.getData()
+        daqData1.to_csv(self.saveDir + "gsr.csv", index=False)
+        daqData.to_csv(self.saveDir + "ekg.csv", index = False)
 
         logging.info("Data saved")
         self.textLabel.setText(f"Data saved at {self.saveDir}")
