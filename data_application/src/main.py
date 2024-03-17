@@ -3,10 +3,10 @@ import os
 import numpy as np
 import logger
 import logging
-# from daq import DataCollectionThread
+from daq import DataCollectionThread
 from pynput.keyboard import Key, Listener, KeyCode
 from camera import Camera
-# from lepton import LeptonCamera
+from lepton import LeptonCamera
 from datetime import datetime
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt
@@ -38,19 +38,19 @@ def PressedKey(key, grid_instance):
             grid_instance.setDirectory()
         grid_instance.showCameras = False
         grid_instance.camera.gathering = True
-        # grid_instance.thermal_camera.gathering = True
-        # grid_instance.data_thread.start()
+        grid_instance.thermal_camera.gathering = True
+        grid_instance.data_thread.start()
         grid_instance.textLabel.setText("Data gathering, press M to stop")
         grid_instance.dataStatusLabel.setText("Data Thread Status: Data gathering")
         grid_instance.startDataCollection()
     elif key == "m":
         logging.critical(f"Pressed {key}")
         grid_instance.camera.gathering = False
-        # grid_instance.thermal_camera.gathering = False
+        grid_instance.thermal_camera.gathering = False
         grid_instance.textLabel.setText("Saving data")
         grid_instance.dataStatusLabel.setText("Saving data")
         grid_instance.cameraFeed.setPixmap(grid_instance.createPlaceholderImage("Data saving"))
-        # grid_instance.thermalCameraFeed.setPixmap(self.createPlaceholderImage("Data saving"))
+        grid_instance.thermalCameraFeed.setPixmap(grid_instance.createPlaceholderImage("Data saving"))
         grid_instance.stopAndSaveData()
 
 class DirectoryInputDialog(QDialog):
@@ -90,18 +90,18 @@ class GridExample(QMainWindow):
         self.gathering = False
         self.showCameras = True
         self.camera = Camera()
-        # self.thermal_camera = LeptonCamera()
+        self.thermal_camera = LeptonCamera()
         self.camera.imageUpdate.connect(self.imageUpdateSlot)
-        # self.thermal_camera.imageUpdate.connect(self.imageTUpdateSlot)
+        self.thermal_camera.imageUpdate.connect(self.imageTUpdateSlot)
         self.camera.start()
-        # self.thermal_camera.start()
+        self.thermal_camera.start()
 
         self.device_description = "USB-4716,BID#0"
         self.profile_path = "../../profile/DemoDevice.xml"
         self.channel_count = 2
         self.start_channel = 0
-        # self.data_thread = DataCollectionThread(self.device_description, self.profile_path,
-        #                                         self.channel_count, self.start_channel)
+        self.data_thread = DataCollectionThread(self.device_description, self.profile_path,
+                                                self.channel_count, self.start_channel)
         
         monitor = KeyMonitor()
         monitor.keyPressed.connect(lambda key: PressedKey(key, self))
@@ -157,16 +157,16 @@ class GridExample(QMainWindow):
         self.dataStatusLabel.setAlignment(Qt.AlignCenter)
 
         self.cameraFeed = QLabel()
-        # self.thermalCameraFeed = QLabel()
+        self.thermalCameraFeed = QLabel()
 
         self.placeholderImage = self.createPlaceholderImage("Data coming soon")
         self.cameraFeed.setPixmap(self.placeholderImage)
-        # self.thermalCameraFeed.setPixmap(self.placeholderImage)
+        self.thermalCameraFeed.setPixmap(self.placeholderImage)
 
         grid.addWidget(infoLabel, 0, 0)
         grid.addWidget(self.dataStatusLabel, 1, 0)
         grid.addWidget(self.cameraFeed, 0, 1)
-        # grid.addWidget(self.thermalCameraFeed, 1, 1)
+        grid.addWidget(self.thermalCameraFeed, 1, 1)
 
         textLayout = QVBoxLayout()
         self.textLabel = QLabel("Showing data")
@@ -213,10 +213,10 @@ class GridExample(QMainWindow):
         self.textLabel1.setText("Save directory: ")
         self.showCameras = True
         self.camera.start()
-        # self.thermal_camera.start()
+        self.thermal_camera.start()
         self.updateCameraConnection()
         self.camera.frames = []
-        # self.thermal_camera.frames = []
+        self.thermal_camera.frames = []
         self.control = ""
         self.name = ""
         self.surname = ""
@@ -239,13 +239,13 @@ class GridExample(QMainWindow):
         if self.showCameras:
             logging.info("Cameras connect update")
             self.camera.imageUpdate.connect(self.imageUpdateSlot)
-            # self.thermal_camera.imageUpdate.connect(self.imageTUpdateSlot)
+            self.thermal_camera.imageUpdate.connect(self.imageTUpdateSlot)
         else:
             logging.info("Cameras disconnect update")
             self.camera.imageUpdate.disconnect(self.imageUpdateSlot)
-            # self.thermal_camera.imageUpdate.disconnect(self.imageTUpdateSlot)
+            self.thermal_camera.imageUpdate.disconnect(self.imageTUpdateSlot)
             self.cameraFeed.setPixmap(self.placeholderImage)
-            # self.thermalCameraFeed.setPixmap(self.placeholderImage)
+            self.thermalCameraFeed.setPixmap(self.placeholderImage)
 
     # def keyPressEvent(self, event):
     #     print(event)
@@ -254,14 +254,14 @@ class GridExample(QMainWindow):
     #             self.setDirectory()
     #         self.showCameras = False
     #         self.camera.gathering = True
-    #         # self.thermal_camera.gathering = True
+            # self.thermal_camera.gathering = True
     #         self.data_thread.start()
     #         self.textLabel.setText("Data gathering, press F2 to stop")
     #         self.dataStatusLabel.setText("Data Thread Status: Data gathering")
     #         self.startDataCollection()
     #     elif event.key() == "m":
     #         self.camera.gathering = False
-    #         # self.thermal_camera.gathering = False
+            # self.thermal_camera.gathering = False
     #         self.textLabel.setText("Saving data")
     #         self.dataStatusLabel.setText("Saving data")
     #         self.cameraFeed.setPixmap(self.createPlaceholderImage("Data saving"))
@@ -272,16 +272,16 @@ class GridExample(QMainWindow):
 
     def startDataCollection(self):
         logging.info("Data Collection Started")
-        self.cameraFeed.setPixmap(self.createPlaceholderImage("Data gathering, press F2 to stop"))
-        # self.thermalCameraFeed.setPixmap(self.createPlaceholderImage("Data gathering, press F2 to stop"))
+        self.cameraFeed.setPixmap(self.createPlaceholderImage("Data gathering, press M to stop"))
+        self.thermalCameraFeed.setPixmap(self.createPlaceholderImage("Data gathering, press M to stop"))
 
     def stopAndSaveData(self):
         self.camera.stop()
-        # self.thermal_camera.stop()
-        # self.data_thread.stop()
+        self.thermal_camera.stop()
+        self.data_thread.stop()
         cameraData = self.camera.getFrames()
-        # leptonData = self.thermal_camera.getFrames()
-        # np.savez(self.saveDir + "data.npz", cameraData=cameraData, leptonData=leptonData)
+        leptonData = self.thermal_camera.getFrames()
+        np.savez(self.saveDir + "data.npz", cameraData=cameraData, leptonData=leptonData)
 
         # daqData, daqData1 = self.data_thread.getData()
         # daqData1.to_csv(self.saveDir + "gsr.csv", index=False)
@@ -294,8 +294,7 @@ class GridExample(QMainWindow):
         self.cameraFeed.setPixmap(QPixmap.fromImage(image))
 
     def imageTUpdateSlot(self, image):
-        # self.thermalCameraFeed.setPixmap(QPixmap.fromImage(image))
-        pass
+        self.thermalCameraFeed.setPixmap(QPixmap.fromImage(image))
 
     def createPlaceholderImage(self, text):
         image = QPixmap(500, 380)
