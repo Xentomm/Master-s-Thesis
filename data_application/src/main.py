@@ -34,8 +34,6 @@ def PressedKey(key, grid_instance):
     key = str(key).strip("'").lower()
     if key == "n":
         logging.critical(f"Pressed {key}")
-        if grid_instance.name == "":
-            grid_instance.setDirectory()
         grid_instance.showCameras = False
         grid_instance.camera.gathering = True
         grid_instance.thermal_camera.gathering = True
@@ -87,6 +85,9 @@ class GridExample(QMainWindow):
         self.surname = ""
         self.age = ""
         self.saveDir = ""
+        self.textLabel1 = QLabel(f"Save directory: {self.saveDir}")
+        if self.name == "":
+            self.setDirectory()
         self.gathering = False
         self.showCameras = True
         self.camera = Camera()
@@ -101,7 +102,7 @@ class GridExample(QMainWindow):
         self.channel_count = 2
         self.start_channel = 0
         self.data_thread = DataCollectionThread(self.device_description, self.profile_path,
-                                                self.channel_count, self.start_channel)
+                                                self.channel_count, self.start_channel, self.saveDir)
         
         monitor = KeyMonitor()
         monitor.keyPressed.connect(lambda key: PressedKey(key, self))
@@ -205,7 +206,7 @@ class GridExample(QMainWindow):
             self.saveDir = f"data_application/collected/{current_datetime}_{self.name[0]}{self.surname[0]}{self.age}/"
             logging.info(f"Save dir: {self.saveDir}")
             os.makedirs(self.saveDir, exist_ok=True)
-            self.textLabel1.setText(self.saveDir)
+            # self.textLabel1.setText(self.saveDir)
 
     def resetApp(self):
         logging.critical("App reset")
