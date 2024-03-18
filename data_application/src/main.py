@@ -250,26 +250,6 @@ class GridExample(QMainWindow):
 
     # def keyPressEvent(self, event):
     #     print(event)
-    #     if event.key() == "n":
-    #         if self.name == "":
-    #             self.setDirectory()
-    #         self.showCameras = False
-    #         self.camera.gathering = True
-            # self.thermal_camera.gathering = True
-    #         self.data_thread.start()
-    #         self.textLabel.setText("Data gathering, press F2 to stop")
-    #         self.dataStatusLabel.setText("Data Thread Status: Data gathering")
-    #         self.startDataCollection()
-    #     elif event.key() == "m":
-    #         self.camera.gathering = False
-            # self.thermal_camera.gathering = False
-    #         self.textLabel.setText("Saving data")
-    #         self.dataStatusLabel.setText("Saving data")
-    #         self.cameraFeed.setPixmap(self.createPlaceholderImage("Data saving"))
-    #         # self.thermalCameraFeed.setPixmap(self.createPlaceholderImage("Data saving"))
-    #         self.stopAndSaveData()
-    #     elif event.key() in f_keys:
-    #         logging.info(f"{f_keys[event.key()]} pressed")
 
     def startDataCollection(self):
         logging.info("Data Collection Started")
@@ -283,10 +263,6 @@ class GridExample(QMainWindow):
         cameraData = self.camera.getFrames()
         leptonData = self.thermal_camera.getFrames()
         np.savez(self.saveDir + "data.npz", cameraData=cameraData, leptonData=leptonData)
-
-        # daqData, daqData1 = self.data_thread.getData()
-        # daqData1.to_csv(self.saveDir + "gsr.csv", index=False)
-        # daqData.to_csv(self.saveDir + "ekg.csv", index = False)
 
         logging.info("Data saved")
         self.textLabel.setText(f"Data saved at {self.saveDir}")
