@@ -73,8 +73,8 @@ class GridExample(QMainWindow):
                        "Setup ActiveView.\n"
                        "Setup Directory in Menu Bar.\n"
                        "Click on Stop Plotting.\n"
-                       "Press N to start data gathering.\n"
-                       "Press M to stop data gathering and save.\n"
+                       "Press F1 to start data gathering.\n"
+                       "Press F1 to stop data gathering and save.\n"
                        "\n"
                        "\n"
                        "\n"
@@ -137,6 +137,7 @@ class GridExample(QMainWindow):
             logging.info(f"Save dir: {self.saveDir}")
             os.makedirs(self.saveDir, exist_ok=True)
             self.textLabel1.setText(self.saveDir)
+            self.textLabel.setText("Press F1 to start gathering data")
         self.monitor.keyPressed.connect(lambda key: PressedKey(key, self))
         self.monitor.start_monitoring()
 
@@ -161,7 +162,7 @@ class GridExample(QMainWindow):
 
     def stopPlots(self):
         logging.info("Plots stopped")
-        self.textLabel.setText("Press F1 to start data gathering")
+        self.textLabel.setText("Setup directory")
         self.showCameras = False
         self.updateCameraConnection()
 
@@ -185,8 +186,8 @@ class GridExample(QMainWindow):
 
     def startDataCollection(self):
         logging.info("Data Collection Started")
-        self.cameraFeed.setPixmap(self.createPlaceholderImage("Data gathering, press M to stop"))
-        # self.thermalCameraFeed.setPixmap(self.createPlaceholderImage("Data gathering, press M to stop"))
+        self.cameraFeed.setPixmap(self.createPlaceholderImage("Data gathering, press F1 to stop"))
+        # self.thermalCameraFeed.setPixmap(self.createPlaceholderImage("Data gathering, press F1 to stop"))
 
     def stopAndSaveData(self):
         self.gathering = False
