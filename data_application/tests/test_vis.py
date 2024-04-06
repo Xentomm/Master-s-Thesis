@@ -10,8 +10,8 @@ along with camera and Lepton frames from the NPZ file.
 def plot_data_from_files(input_dir, num_of_frames=5, sample_size=1000):
     dir_path = f"data_application/collected/{input_dir}/"
     
-    ekg = pd.read_csv(dir_path + "ekg.csv")
-    gsr = pd.read_csv(dir_path + "gsr.csv")
+    ekg = pd.read_csv(dir_path + "ekg_data.csv")
+    gsr = pd.read_csv(dir_path + "gsr_data.csv")
     npz_data = np.load(dir_path + "data.npz")
 
     frames_camera = npz_data['cameraData']
