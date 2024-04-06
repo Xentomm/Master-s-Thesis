@@ -160,3 +160,5 @@ cython_debug/
 #.idea/
 data_application/collected/*
 config.json
+
+Data_app.lnk
