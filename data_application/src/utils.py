@@ -37,24 +37,24 @@ def PressedKey(key, grid_instance):
         grid_instance.gathering = True
         grid_instance.showCameras = False
         grid_instance.camera.gathering = True
-        # grid_instance.thermal_camera.gathering = True
-        # grid_instance.data_thread.start()
+        grid_instance.thermal_camera.gathering = True
+        grid_instance.data_thread.start()
         grid_instance.textLabel.setText("Data gathering, press F1 to stop")
         grid_instance.dataStatusLabel.setText("Data Thread Status: Data gathering")
         grid_instance.startDataCollection()
     elif key == Key.f1 and grid_instance.gathering == True:
         logging.critical(f"Pressed {key} FLAG DATA STOPPED")
         grid_instance.camera.gathering = False
-        # grid_instance.thermal_camera.gathering = False
+        grid_instance.thermal_camera.gathering = False
         grid_instance.textLabel.setText("Saving data")
         grid_instance.dataStatusLabel.setText("Saving data")
         grid_instance.cameraFeed.setPixmap(grid_instance.createPlaceholderImage("Data saving"))
-        # grid_instance.thermalCameraFeed.setPixmap(grid_instance.createPlaceholderImage("Data saving"))
+        grid_instance.thermalCameraFeed.setPixmap(grid_instance.createPlaceholderImage("Data saving"))
         grid_instance.stopAndSaveData()
     elif key == Key.f6:
-        logging.critical(f"Pressed {key} FLAG ... ")
+        logging.critical(f"Pressed {key} FLAG NEW DECK ")
     elif key == Key.f7:
-        logging.critical(f"Pressed {key} FLAG ... ")
+        logging.critical(f"Pressed {key} FLAG WAITING ")
     elif key == Key.f8:
         logging.critical(f"Pressed {key} FLAG ... ")
     else:

@@ -1,6 +1,6 @@
 @echo off
 rem Activate virtual environment
-call .venv\Scripts\activate.bat
+call .env\Scripts\activate.bat
 
 rem Run Python script
 python data_application\src\main.py
