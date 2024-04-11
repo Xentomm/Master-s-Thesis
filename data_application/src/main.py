@@ -69,18 +69,22 @@ class GridExample(QMainWindow):
 
         infoLabel = QLabel("Instructions:\n\n"
                        "Watch camera feed and setup them correctly.\n"
-                       "Setup ActiveView.\n"
+                       "Launch ActiveView.\n"
                        "Setup Directory in Menu Bar.\n"
                        "Click on Stop Plotting.\n"
+                       "Start ActiView file in the same directory.\n"
                        "Press F1 to start data gathering.\n"
                        "Press F1 to stop data gathering and save.\n"
                        "\n"
                        "\n"
+                       "Use these to flag the game:\n"
+                       "F6 -> new deal\n"
+                       "F7 -> ...\n"
+                       "F8 -> ...\n"
                        "\n"
                        "\n"
                        "Press File -> Reset in Menu Bar to restart the application.\n"
-                       "Press Start Plotting to show camera feeds.\n"
-                       "Press Stop Plotting to pause camera feeds.")
+                       "Or restart the app by exiting")
         infoLabel.setAlignment(Qt.AlignCenter)
         
         self.dataStatusLabel = QLabel("Data Thread Status: Idle")
