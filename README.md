@@ -21,17 +21,16 @@ $ pip install -r requirements.txt
 TODO
 ## Usage
 
-...
-
-```bash
-$ ... 
-```
+Run the .bat file or the main.py.
 
 ## Features
 
-- ...
-- ...
-- ...
+- Gathering data from camera and thermal camera
+- Gathering data from Advantech DAQ 
+- Saving data to .csv and .npz files
+- User interface
+- Creating logs for basic workflow and click control
+- Simple visualization of gathered data
 
 ## Team members
 
