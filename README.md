@@ -18,7 +18,7 @@ $ source .env/Scripts/actiavate (Windows) | source .env/bin/activate (Linux)
 $ python.exe -m pip install --upgrade pip
 $ pip install -r requirements.txt
 ```
-TODO
+
 ## Usage
 
 Run the .bat file or the main.py.
