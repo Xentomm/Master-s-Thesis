@@ -35,8 +35,8 @@ Data application features:
 - Simple visualization of gathered data
 
 AI/ML features:
-TODO
-- 
+
+- TODO
 
 ## Team members
 
