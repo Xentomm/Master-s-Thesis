@@ -17,11 +17,11 @@ def plot_data_from_files(input_dir, num_of_frames=5, sample_size=10000):
     frames_camera = npz_data['cameraData']
     frames_lepton = npz_data['leptonData']
 
-    fig_csv, axs_csv = plt.subplots(2)
-    axs_csv[0].plot(ekg[:sample_size])
-    axs_csv[0].set_title("EKG")
-    axs_csv[1].plot(gsr[:sample_size])
-    axs_csv[1].set_title("GSR")
+    fig_csv, axs_csv = plt.subplots(2, figsize=(8, 6))  # Adjust figsize as needed
+    axs_csv[0].plot(ekg[1000:sample_size])
+    axs_csv[0].set_title("EKG", pad=20)  # Add padding to move title down
+    axs_csv[1].plot(gsr[1000:sample_size])
+    axs_csv[1].set_title("GSR", pad=20, y=0.9)
 
     print("Length of ekg data: " + str(len(ekg)))
     print("Length of gsr data: " + str(len(gsr)))

@@ -33,7 +33,7 @@ class KeyMonitor(QtCore.QObject):
 
 def PressedKey(key, grid_instance):
     if key == Key.f1 and grid_instance.gathering == False:
-        logging.critical(f"Pressed {key} FLAG DATA START")
+        logging.critical(f"Pressed {key} FLAG START CROSS")
         grid_instance.gathering = True
         grid_instance.showCameras = False
         grid_instance.camera.gathering = True
@@ -43,7 +43,7 @@ def PressedKey(key, grid_instance):
         grid_instance.dataStatusLabel.setText("Data Thread Status: Data gathering")
         grid_instance.startDataCollection()
     elif key == Key.f1 and grid_instance.gathering == True:
-        logging.critical(f"Pressed {key} FLAG DATA STOPPED")
+        logging.critical(f"Pressed {key} FLAG DATA STOP")
         grid_instance.camera.gathering = False
         grid_instance.thermal_camera.gathering = False
         grid_instance.textLabel.setText("Saving data")
@@ -51,12 +51,16 @@ def PressedKey(key, grid_instance):
         grid_instance.cameraFeed.setPixmap(grid_instance.createPlaceholderImage("Data saving"))
         grid_instance.thermalCameraFeed.setPixmap(grid_instance.createPlaceholderImage("Data saving"))
         grid_instance.stopAndSaveData()
+    elif key == Key.f3:
+        logging.critical(f"Pressed {key} FLAG CROSS STOPPED")
+    elif key == Key.f4:
+        logging.critical(f"Pressed {key} FLAG DATA START")
     elif key == Key.f6:
-        logging.critical(f"Pressed {key} FLAG NEW DECK ")
+        logging.critical(f"Pressed {key} FLAG NEW DECK")
     elif key == Key.f7:
-        logging.critical(f"Pressed {key} FLAG WAITING ")
+        logging.critical(f"Pressed {key} FLAG WAITING")
     elif key == Key.f8:
-        logging.critical(f"Pressed {key} FLAG ... ")
+        logging.critical(f"Pressed {key} FLAG PLACEHOLDER")
     else:
         pass
 

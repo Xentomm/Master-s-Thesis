@@ -138,6 +138,7 @@ class GridExample(QMainWindow):
             current_datetime = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
             self.saveDir = f"data_application/collected/{current_datetime}_{self.name[0]}{self.surname[0]}{self.age}/"
             logging.info(f"Save dir: {self.saveDir}")
+            logging.info(f"Patient Data: {self.name}, {self.surname}, {self.age}")
             os.makedirs(self.saveDir, exist_ok=True)
             self.textLabel1.setText(self.saveDir)
             self.textLabel.setText("Press F1 to start gathering data")

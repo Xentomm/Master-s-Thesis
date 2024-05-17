@@ -15,9 +15,9 @@ class Camera(QThread):
     def run(self):
         self.threadActive = True
         try:
-            capture = cv2.VideoCapture(1)
-        except:
             capture = cv2.VideoCapture(0)
+        except:
+            capture = cv2.VideoCapture(1)
         frame_interval = 1 / 3  # 3 frames per second
         last_capture_time = time.time()
         while self.threadActive:
