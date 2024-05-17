@@ -18,20 +18,25 @@ $ source .env/Scripts/actiavate (Windows) | source .env/bin/activate (Linux)
 $ python.exe -m pip install --upgrade pip
 $ pip install -r requirements.txt
 ```
-TODO
+
 ## Usage
 
-...
+Run the .bat file or the main.py.
 
-```bash
-$ ... 
-```
+## Features 
 
-## Features
+Data application features:
 
-- ...
-- ...
-- ...
+- Gathering data from camera and thermal camera
+- Gathering data from Advantech DAQ 
+- Saving data to .csv and .npz files
+- User interface
+- Creating logs for basic workflow and click control
+- Simple visualization of gathered data
+
+AI/ML features:
+
+- TODO
 
 ## Team members
 
