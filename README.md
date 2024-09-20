@@ -36,7 +36,8 @@ Data application features:
 
 AI/ML features:
 
-- TODO
+- SVM
+- Transfer Learining
 
 ## Team members
 
